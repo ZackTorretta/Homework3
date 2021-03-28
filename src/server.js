@@ -2,8 +2,7 @@ const express = require('express');
 
 const app = express();
 
-app.get('/', (req, res) => {
+app.use((req, res, next) => {
   res.send();
 });
-
 app.listen(8080);
