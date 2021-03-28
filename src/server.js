@@ -5,6 +5,7 @@ require('dotenv/config');
 
 const app = express();
 app.use(BodyParser.json());
+
 /* app.use((req, res, next) => {
   console.log('hello');
   req.whatever = 123;
@@ -15,7 +16,7 @@ app.use((req, res, next) => {
   next();
 }); */
 app.get('/', (req, res) => {
-  res.send('hello world');
+  res.status(StatusCodes.OK);
 });
 
 (async () => {
