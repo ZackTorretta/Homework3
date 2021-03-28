@@ -3,7 +3,7 @@ const BodyParser = require('body-parser');
 const Mongoose = require('mongoose');
 
 const app = express();
-
+app.use(BodyParser.json());
 /* app.use((req, res, next) => {
   console.log('hello');
   req.whatever = 123;
