@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 });
 
 (async () => {
-  await Mongoose.connect('mongodb+srv://ADMIN:ztorre97@cluster0.doojn.mongodb.net/Cluster0?retryWrites=true&w=majority', {
+  await Mongoose.connect(process.env.DB_CONNECTION, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
