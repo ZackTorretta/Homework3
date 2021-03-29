@@ -34,18 +34,34 @@ module.exports = (req, res, next) => {
   console.log(y);
   const requestDate = Number.parseInt(z, 10);
   const requestDateTest = Number.parseInt(y, 10);
-  console.log(requestDate);
+  // console.log(requestDateTest);
   // console.log(requestDateTest);
   const currentDate = Math.round(Date.now() / 1000);
   console.log(currentDate);
   if (!Number.isNaN(requestDate || requestDateTest)) {
-    const test1 = createFunction1(currentDate, requestDate);// check if query is in spec
+    let test1 = null;
+    let test2 = null;
+    if (z !== null) {
+      test1 = createFunction1(currentDate, requestDate);
+    }
+    // check if query is in spec
     console.log(test1);
-    const test2 = createFunction1(currentDate, requestDateTest);// check if header is in spec
+    if (y !== null) {
+      test2 = createFunction1(currentDate, requestDateTest);// check if header is in spec
+    }
     console.log(test2);
+    // if it returns false, then it is out of spec. end out right.
+    // if (test1 === true && y === null) {
+    //   console.log('good to go');
+    // } else if (test2 === true && z === null) {
+    //   console.log('good to go 2');
+    // }
     if (test1 === false || test2 === false) {
       console.log('at least one date is out-of-spec');
       res.sendStatus(StatusCodes.UNAUTHORIZED);
+    } else {
+      console.log('good to go actually');
+      next();
     }
     // console.log(test1);
     // console.log(test2);
@@ -58,7 +74,7 @@ module.exports = (req, res, next) => {
     // console.log(y);
     // this is IN-SPEC
   } else {
-    console.log('neither supplied date');
+    console.log('no dates supplied');
     res.sendStatus(StatusCodes.UNAUTHORIZED);
   }
   // check if null. if it is null then the request KEY is bad. ABOVE
