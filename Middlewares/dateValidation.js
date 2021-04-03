@@ -59,7 +59,7 @@ module.exports = (req, res, next) => {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
   } else if (queryReturn === 'outSpec' || headerReturn === 'outSpec') { // if at least one out of spec. 401
     res.sendStatus(StatusCodes.UNAUTHORIZED);
-  } else if (compareDates === 'diffNumbers') { // if both are numbers, but not same. 401
+  } else if (compareDates === 'diffNumbers') { // if both are dates, but not same. 401
     if (queryDate !== headerDate) {
       res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
