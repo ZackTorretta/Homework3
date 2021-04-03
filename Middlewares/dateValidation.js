@@ -1,13 +1,13 @@
 const StatusCodes = require('http-status-codes');
 
 const findValue = (thing, search) => {
-  const x = thing.toLowerCase();
+  const dateValCheck = thing.toLowerCase();
   let result = null;
-  let k = '';
+  let lowerKey = '';
   Object.keys(search).forEach((key) => {
     // set k as a variable above. that way it doesn't have to constantly create 'const k' per loop
-    k = key.toLowerCase(); // set k to the key but lower case
-    if (k === x) {
+    lowerKey = key.toLowerCase(); // set this to the key but lower case
+    if (lowerKey === dateValCheck) {
       result = search[key];
     }
   });
@@ -27,9 +27,9 @@ function checkValidity(current, theDate) {
   return theResult;
 }
 module.exports = (req, res, next) => {
-  const z = findValue('date-validation', req.query);
-  const y = findValue('date-validation', req.headers);
-  // if z and y are NULL. Then it's blank or they didn't type date-validation correctly.
+  const queryValue = findValue('date-validation', req.query);
+  const headerValue = findValue('date-validation', req.headers);
+  // if these are NULL, Then it's blank or they didn't type date-validation correctly.
   let queryDate = null; // query info
   let headerDate = null;// header info
   let queryReturn;
@@ -37,14 +37,14 @@ module.exports = (req, res, next) => {
   let compareDates = ''; // to check if the two dates are equal
   const currentDate = Math.round(Date.now() / 1000);
   // no need to run parse int if it's a null. waste of time.
-  if (z !== null) {
-    queryDate = Number.parseInt(z, 10);
+  if (queryValue !== null) {
+    queryDate = Number.parseInt(queryValue, 10);
     queryReturn = checkValidity(currentDate, queryDate);
   } else {
     queryReturn = 'notNum'; // don't need isNaN function to check anything here because it was a NULL
   }
-  if (y !== null) {
-    headerDate = Number.parseInt(y, 10);
+  if (headerValue !== null) {
+    headerDate = Number.parseInt(headerValue, 10);
     headerReturn = checkValidity(currentDate, headerDate);
   } else {
     headerReturn = 'notNum'; // again, it's a NULL, so not need to check isNaN from function
