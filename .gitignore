@@ -77,3 +77,6 @@ src/.env
 
 # JetBrains Webstorm
 .idea/
+
+# JetBrains Webstorm
+.env

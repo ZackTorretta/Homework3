@@ -13,74 +13,65 @@ const findValue = (thing, search) => {
   });
   return result;
 };
-
-function createFunction1(current, theDate) {
-  let theResult = null;
-  if ((current - 300) <= theDate && theDate <= (current + 300)) {
-    // console.log('verified');
-    theResult = true;
+function checkValidity(current, theDate) {
+  let theResult;
+  if (!Number.isNaN(theDate)) {
+    if ((current - 300) <= theDate && theDate <= (current + 300)) {
+      theResult = 'inSpec';
+    } else {
+      theResult = 'outSpec';
+    }
   } else {
-    theResult = false;
+    theResult = 'outSpec';
   }
   return theResult;
 }
-// else { // this is OUT-OF-SPEC.  IF ANY OUT OF SPEC, THEN IT'S 401.
-//   res.sendStatus(StatusCodes.UNAUTHORIZED);
-// }
 module.exports = (req, res, next) => {
   const z = findValue('date-validation', req.query);
   const y = findValue('date-validation', req.headers);
-  console.log(z);
-  console.log(y);
-  const requestDate = Number.parseInt(z, 10);
-  const requestDateTest = Number.parseInt(y, 10);
-  // console.log(requestDateTest);
-  // console.log(requestDateTest);
+  // if z and y are NULL. Then it's blank or they didn't type date-validation correctly.
+  let queryDate = null; // query info
+  let headerDate = null;// header info
+  let queryReturn;
+  let headerReturn;
+  let compareDates = ''; // to check if the two dates are equal
   const currentDate = Math.round(Date.now() / 1000);
-  console.log(currentDate);
-  if (!Number.isNaN(requestDate || requestDateTest)) {
-    let test1 = null;
-    let test2 = null;
-    if (z !== null) {
-      test1 = createFunction1(currentDate, requestDate);
-    }
-    // check if query is in spec
-    console.log(test1);
-    if (y !== null) {
-      test2 = createFunction1(currentDate, requestDateTest);// check if header is in spec
-    }
-    console.log(test2);
-    // if it returns false, then it is out of spec. end out right.
-    // if (test1 === true && y === null) {
-    //   console.log('good to go');
-    // } else if (test2 === true && z === null) {
-    //   console.log('good to go 2');
-    // }
-    if (test1 === false || test2 === false) {
-      console.log('at least one date is out-of-spec');
-      res.sendStatus(StatusCodes.UNAUTHORIZED);
-    } else {
-      console.log('good to go actually');
-      next();
-    }
-    // console.log(test1);
-    // console.log(test2);
-    // console.log('it is a number');
-    // console.log(requestDate);
-    // console.log(currentDate);
-    // // req.dateValidation = date;// property for future middleware to use. (logger)
-    // // req.currentValidation = current; // property for future middleware to use like above
-    //
-    // console.log(y);
-    // this is IN-SPEC
+  // no need to run parse int if it's a null. waste of time.
+  if (z !== null) {
+    queryDate = Number.parseInt(z, 10);
+    queryReturn = checkValidity(currentDate, queryDate);
   } else {
-    console.log('no dates supplied');
-    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    queryReturn = 'notNum'; // don't need isNaN function to check anything here because it was a NULL
   }
-  // check if null. if it is null then the request KEY is bad. ABOVE
-  // checks if value is bad
-
-  // console.log(findValue('date-validation', req.query));
-  // console.log(findValue('date-validation', req.headers));// same as req.query.
-  // It's just larger. Will loop more
+  if (y !== null) {
+    headerDate = Number.parseInt(y, 10);
+    headerReturn = checkValidity(currentDate, headerDate);
+  } else {
+    headerReturn = 'notNum'; // again, it's a NULL, so not need to check isNaN from function
+  }
+  // here it checks if both are numbers/dates. if so, are they equal?
+  if (queryReturn !== 'notNum' && headerReturn !== 'notNum') {
+    if (queryDate !== headerDate) {
+      compareDates = 'diffNumbers';
+    }
+  }
+  if (queryReturn === 'notNum' && headerReturn === 'notNum') { // if neither supplied date, send 401 here
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+  } else if (queryReturn === 'outSpec' || headerReturn === 'outSpec') { // if at least one out of spec. 401
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+  } else if (compareDates === 'diffNumbers') { // if both are numbers, but not same. 401
+    if (queryDate !== headerDate) {
+      res.sendStatus(StatusCodes.UNAUTHORIZED);
+    }
+  } else {
+    if (queryReturn === 'inSpec') {
+      req.dateValidation = queryDate;
+    } else {
+      req.dateValidation = headerDate;
+    }
+    req.currentDate = currentDate;// IMPORTANT: we need to log this anyway
+    // both have to be equal to each other if they are numbers/dates.
+    // so, if both are in-spec and same #. either one works for the property object.
+    next();
+  }
 };
